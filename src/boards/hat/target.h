@@ -38,12 +38,12 @@
 #define IMU_INT_PIO PA0_PIO
 
 /* LEDs  */
-#define LED_ERROR_PIO PA20_PIO
-#define LED_STATUS_PIO PA23_PIO
+#define LED_ERROR_PIO PA1_PIO 
+#define LED_STATUS_PIO PA0_PIO
 
 /* General  */
-#define APPENDAGE_PIO PA1_PIO
-#define SERVO_PWM_PIO PA2_PIO
+#define APPENDAGE_PIO PA20_PIO
+#define SERVO_PWM_PIO PA23_PIO
 
 /* Button  */
 #define BUTTON_PIO PA16_PIO
