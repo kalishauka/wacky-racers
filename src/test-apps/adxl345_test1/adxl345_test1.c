@@ -41,6 +41,9 @@ main (void)
     int ticks = 0;
     int count = 0;
 
+    float defualt_speed = 0.7;
+    float PWM_value = 0;
+
     // Redirect stdio to USB serial
     usb_serial_stdio_init ();
 
@@ -86,7 +89,19 @@ main (void)
             int16_t accel[3];
             if (adxl345_accel_read (adxl345, accel))
             {
-                printf ("x: %5d  y: %5d  z: %5d\n", accel[0], accel[1], accel[2]);
+                float speed = map(accel[1], -255, 255, 0, 1);
+
+                float a = defualt_speed/0.25;
+                float c = (defualt_speed-1)/0.5;
+                float d = 1-c;
+
+                if (speed < 0.5) {
+                    PWM_value = a*speed^2;
+                } else {
+                    PWM_value = c*speed + d;
+                }
+
+                printf ("PWM Speed: %5f \n", PWM_value);
             }
             else
             {
