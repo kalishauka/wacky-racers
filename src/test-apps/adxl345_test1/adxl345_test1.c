@@ -1,8 +1,9 @@
-/* File:   adxl345_test1.c
-   Author: M. P. Hayes, UCECE
-   Date:   3 December 2022
-   Descr:  Read from an ADXL345 accelerometer and write its output to the USB serial.
+/* File:   radio_data.c
+   Author: P. K. Stenger
+   Date:   6 May 2023
+   Descr:  Read from an ADXL345 accelerometer, transforms into motor PWM's and write its output to the USB serial.
 */
+
 #include "pio.h"
 #include "delay.h"
 #include "target.h"
@@ -10,6 +11,7 @@
 #include "usb_serial.h"
 #include "adxl345.h"
 #include "panic.h"
+#include <math.h>
 
 /*
  * NOTE: you must define ADXL345_ADDRESS in target.h for this to compile.
@@ -32,17 +34,61 @@ static twi_cfg_t adxl345_twi_cfg =
     .slave_addr = 0
 };
 
+float map(float value, float fromLow, float fromHigh, float toLow, float toHigh) {
+    return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+}
 
-int
-main (void)
+float find_speed_constant(float y, float default_Speed, float default_reverse_speed) {
+    float speed_constant = 0.0;
+    float a = 0.0, c = 0.0, d = 0.0;
+
+    if (y < 0.5) {
+        a = default_Speed / 0.25;
+        speed_constant = a * pow(y, 2);
+    } else {
+        c = -(default_Speed - 1) / 0.5;
+        d = 1 - c;
+        speed_constant = c * y + d;
+    }
+
+    if (speed_constant == 0.0) {
+        speed_constant = default_reverse_speed;
+    }
+
+    return speed_constant;
+}
+
+void find_motor_ratio(float x, float speed_constant, float *left_motor, float *right_motor) {
+    *left_motor = 1.0;
+    *right_motor = 1.0;
+
+    if (x > 0) {
+        *right_motor = 1.0 - x;
+    } else {
+        *left_motor = 1.0 + x;
+    }
+}
+
+void find_motor_PWM(float speed_constant, float left_motor, float right_motor, float *PWM_left_motor, float *PWM_right_motor) {
+    *PWM_right_motor = speed_constant * right_motor;
+    *PWM_left_motor = speed_constant * left_motor;
+}
+
+int main (void)
 {
     twi_t adxl345_twi;
     adxl345_t *adxl345;
     int ticks = 0;
     int count = 0;
 
-    float defualt_speed = 0.7;
-    float PWM_value = 0;
+    float default_speed = 0.7;
+    float default_reverse_speed = 0.4;
+
+    float x, y;
+    float speed_constant;
+    float PWM_value;
+    float left_motor, right_motor;
+    float PWM_left_motor, PWM_right_motor;
 
     // Redirect stdio to USB serial
     usb_serial_stdio_init ();
@@ -89,19 +135,22 @@ main (void)
             int16_t accel[3];
             if (adxl345_accel_read (adxl345, accel))
             {
-                float speed = map(accel[1], -255, 255, 0, 1);
+                /* Standardize accelerometer values for easy transformation into PWM*/
+                x = map(accel[0], -255, 255, -1, 1);
+                y = map(accel[1], -255, 255, 0, 1);
 
-                float a = defualt_speed/0.25;
-                float c = (defualt_speed-1)/0.5;
-                float d = 1-c;
+                /* Find speed constant from y value of accelerometer*/
+                speed_constant = find_speed_constant(y, default_speed, default_reverse_speed);
 
-                if (speed < 0.5) {
-                    PWM_value = a*speed^2;
-                } else {
-                    PWM_value = c*speed + d;
-                }
+                /* Find motor ratio from x value of accelerometer*/
+                find_motor_ratio(x, speed_constant, &left_motor, &right_motor);
 
-                printf ("PWM Speed: %5f \n", PWM_value);
+                /* Find PWM values for each motor*/
+                find_motor_PWM(speed_constant, left_motor, right_motor, &PWM_left_motor, &PWM_right_motor);
+
+                /* print PWM values to serial monitor*/
+                printf("Left Motor: %f || Right Motor: %f\n", PWM_left_motor, PWM_right_motor);
+               
             }
             else
             {
