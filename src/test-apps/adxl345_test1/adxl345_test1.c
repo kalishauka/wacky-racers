@@ -16,6 +16,8 @@
 /*
  * NOTE: you must define ADXL345_ADDRESS in target.h for this to compile.
  */
+
+#define ADXL345_ADDRESS 0x53
 #ifndef ADXL345_ADDRESS
 #error ADXL345_ADDRESS must be defined
 #endif
@@ -38,21 +40,24 @@ float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
     return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
 }
 
-float find_speed_constant(float y, float default_Speed, float default_reverse_speed) {
+float find_speed_constant(float y, float default_Speed, float default_reverse_speed, bool *reversing) {
     float speed_constant = 0.0;
     float a = 0.0, c = 0.0, d = 0.0;
 
     if (y < 0.5) {
         a = default_Speed / 0.25;
         speed_constant = a * pow(y, 2);
+        *reversing = false;
     } else {
         c = -(default_Speed - 1) / 0.5;
         d = 1 - c;
         speed_constant = c * y + d;
+        *reversing = false;
     }
 
-    if (speed_constant == 0.0) {
+    if (speed_constant < 0.1) {
         speed_constant = default_reverse_speed;
+        *reversing = true;
     }
 
     return speed_constant;
@@ -82,13 +87,15 @@ int main (void)
     int count = 0;
 
     float default_speed = 0.7;
-    float default_reverse_speed = 0.4;
+    float default_reverse_speed = 0.8;
 
     float x, y;
     float speed_constant;
     float PWM_value;
     float left_motor, right_motor;
     float PWM_left_motor, PWM_right_motor;
+
+    bool reversing = false;
 
     // Redirect stdio to USB serial
     usb_serial_stdio_init ();
@@ -135,12 +142,25 @@ int main (void)
             int16_t accel[3];
             if (adxl345_accel_read (adxl345, accel))
             {
+
+                if (accel[0] > 160) {
+                    accel[0] = 160;
+                } else if (accel[0] < -160) {
+                    accel[0] = -160;
+                }
+
+                if (accel[1] > 160) {
+                    accel[1] = 160;
+                } else if (accel[1] < -160) {
+                    accel[1] = -160;
+                }
+
                 /* Standardize accelerometer values for easy transformation into PWM*/
-                x = map(accel[0], -255, 255, -1, 1);
-                y = map(accel[1], -255, 255, 0, 1);
+                x = map(accel[0], -160, 160, -1, 1);
+                y = map(accel[1], -160, 160, 0, 1);
 
                 /* Find speed constant from y value of accelerometer*/
-                speed_constant = find_speed_constant(y, default_speed, default_reverse_speed);
+                speed_constant = find_speed_constant(y, default_speed, default_reverse_speed, &reversing);
 
                 /* Find motor ratio from x value of accelerometer*/
                 find_motor_ratio(x, speed_constant, &left_motor, &right_motor);
@@ -149,7 +169,7 @@ int main (void)
                 find_motor_PWM(speed_constant, left_motor, right_motor, &PWM_left_motor, &PWM_right_motor);
 
                 /* print PWM values to serial monitor*/
-                printf("Left Motor: %f || Right Motor: %f\n", PWM_left_motor, PWM_right_motor);
+                printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
                
             }
             else
