@@ -2,6 +2,9 @@
     "windowsToolchainEnvCmd": "C:\\ence461\\ence461-path.bat",
     "makeNumJobs": "2",
     "files.associations": {
-        "nrf24.h": "c"
-    }
+        "nrf24.h": "c",
+        "usb_serial.h": "c",
+        "pwm.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }

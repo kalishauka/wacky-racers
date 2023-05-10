@@ -29,7 +29,6 @@ main (void)
 {
     /* Configure STATUS LED PIO as output.  */
     pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_HIGH);
-
     pacer_init (LED_FLASH_RATE * 2);
 
     while (1)
