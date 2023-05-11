@@ -40,24 +40,24 @@ float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
     return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
 }
 
-float find_speed_constant(float y, float default_Speed, float default_reverse_speed, bool *reversing) {
+float find_speed_constant(float y, float default_Speed, float default_reverse_speed, float *reversing) {
     float speed_constant = 0.0;
     float a = 0.0, c = 0.0, d = 0.0;
 
     if (y < 0.5) {
         a = default_Speed / 0.25;
         speed_constant = a * pow(y, 2);
-        *reversing = false;
+        *reversing = 0.0;
     } else {
         c = -(default_Speed - 1) / 0.5;
         d = 1 - c;
         speed_constant = c * y + d;
-        *reversing = false;
+        *reversing = 0.0;
     }
 
     if (speed_constant < 0.1) {
         speed_constant = default_reverse_speed;
-        *reversing = true;
+        *reversing = 1.0;
     }
 
     return speed_constant;
@@ -79,7 +79,7 @@ void find_motor_PWM(float speed_constant, float left_motor, float right_motor, f
     *PWM_left_motor = speed_constant * left_motor;
 }
 
-int get_PWM (void)
+float* get_PWM (void)
 {
     twi_t adxl345_twi;
     adxl345_t *adxl345;
@@ -95,7 +95,9 @@ int get_PWM (void)
     float left_motor, right_motor;
     float PWM_left_motor, PWM_right_motor;
 
-    bool reversing = false;
+    float reversing = 0.0;
+
+    float* output_list = malloc(3 * sizeof(float));
 
     // Redirect stdio to USB serial
     usb_serial_stdio_init ();
@@ -169,7 +171,13 @@ int get_PWM (void)
                 find_motor_PWM(speed_constant, left_motor, right_motor, &PWM_left_motor, &PWM_right_motor);
 
                 /* print PWM values to serial monitor*/
-                printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
+                // printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
+
+                output_list[0] = PWM_left_motor;
+                output_list[1] = PWM_right_motor;
+                output_list[2] = reversing;
+
+                return output_list;
 
             }
             else

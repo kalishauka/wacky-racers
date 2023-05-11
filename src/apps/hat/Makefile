@@ -1,6 +1,6 @@
 PERIPHERALS = pit
-DRIVERS =
-SRC = hat.c
+DRIVERS = pacer usb_serial adxl345 panic
+SRC = hat.c adxl345_PWM.c
 
 # Use low level of optimisation to simplify debugging
 OPT = -O1

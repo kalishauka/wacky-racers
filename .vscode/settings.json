@@ -2,6 +2,9 @@
     "windowsToolchainEnvCmd": "C:\\ence461\\ence461-path.bat",
     "makeNumJobs": "2",
     "files.associations": {
-        "nrf24.h": "c"
+        "nrf24.h": "c",
+        "adxl345.h": "c",
+        "adxl345_test1.h": "c",
+        "target.h": "c"
     }
 }

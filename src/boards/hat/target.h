@@ -55,6 +55,8 @@
 #define RADIO_CH2_PIO PA22_PIO
 #define RADIO_CH3_PIO PA19_PIO
 
+#define RADIO_POWER_ENABLE_PIO PA29_PIO
+
 /* LED tape  */
 #define LEDTAPE_PIO PA8_PIO
 
