@@ -97,9 +97,9 @@ int main (void)
     usb_serial_stdio_init ();
 
     pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_LOW);
-    pio_output_set (LED_ERROR_PIO, ! LED_ACTIVE);
+    pio_output_set (LED_ERROR_PIO, ! PIO_OUTPUT_HIGH);
     pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
-    pio_output_set (LED_STATUS_PIO, ! LED_ACTIVE);
+    pio_output_set (LED_STATUS_PIO, ! PIO_OUTPUT_HIGH);
 
     // Initialise the TWI (I2C) bus for the ADXL345
     adxl345_twi = twi_init (&adxl345_twi_cfg);
