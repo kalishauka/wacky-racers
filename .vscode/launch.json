@@ -29,8 +29,8 @@
             "customLaunchSetupCommands": [],
             "setupCommands": [
                 {"text": "target remote tcp:localhost:3333", "description": ""},
-                {"text": "symbol-file ${fileDirname}/build/app.elf", "description": ""},
-                {"text": "load ${fileDirname}/build/app.elf", "description": ""},
+                {"text": "symbol-file \"${fileDirname}/build/app.elf\"", "description": ""},
+                {"text": "load \"${fileDirname}/build/app.elf\"", "description": ""},
                 {"text": "break main", "description": ""},
                 {"text": "monitor reset halt", "description": ""}
             ],
@@ -41,11 +41,14 @@
                 "targetArchitecture": "arm",
                 "setupCommands": [
                     {"text": "target remote tcp:localhost:3333", "description": ""},
-                    {"text": "symbol-file ${input:windowsPathELF}", "description": ""},
-                    {"text": "load ${input:windowsPathELF}", "description": ""},
+                    {"text": "symbol-file \"${input:windowsPathELF}\"", "description": ""},
+                    {"text": "load \"${input:windowsPathELF}\"", "description": ""},
                     {"text": "break main", "description": ""},
                     {"text": "monitor reset halt", "description": ""}
                 ]
+            },
+            "osx": {
+                "miDebuggerPath": "arm-none-eabi-gdb"
             }
         }
     ]

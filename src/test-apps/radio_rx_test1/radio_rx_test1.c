@@ -31,6 +31,8 @@ int main(void)
             .address = RADIO_ADDRESS,
             .payload_size = RADIO_PAYLOAD_SIZE,
             .ce_pio = RADIO_CE_PIO,
+            // If the IRQ pin is not connected, use a value of 0.
+            // .irq_pio = 0,
             .irq_pio = RADIO_IRQ_PIO,
             .spi = spi_cfg,
         };

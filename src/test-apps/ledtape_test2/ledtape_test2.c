@@ -19,6 +19,10 @@
     at specific positions (not GRB, it handles the translation automatically).
     It also makes it easy to make patterns, shuffle them allow the strip, and
     clear it later. See ledbuffer.h for more details (CTRL-Click it in VS Code).
+
+    Troubleshooting: check the frequency of the generated waveform; if it is not
+    close to 800 kHz, adjust the value of LEDTAPE_TPERIOD by defining it in
+    target.h. (See src/mmculib/ledtape/ledtape.h for more info.)
 */
 
 int

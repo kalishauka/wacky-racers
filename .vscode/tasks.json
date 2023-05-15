@@ -122,9 +122,9 @@
         {
             "label": "Launch OpenOCD",
             "type": "shell",
-            "command": "openocd -f ${workspaceFolder}/src/mat91lib/sam4s/scripts/sam4s_stlink.cfg",
+            "command": "openocd -f \"${workspaceFolder}/src/mat91lib/sam4s/scripts/sam4s_stlink.cfg\"",
             "windows": {
-                "command": "${config:windowsToolchainEnvCmd} && openocd -f ${workspaceFolder}/src/mat91lib/sam4s/scripts/sam4s_stlink.cfg",
+                "command": "${config:windowsToolchainEnvCmd} && openocd -f \"${workspaceFolder}/src/mat91lib/sam4s/scripts/sam4s_stlink.cfg\"",
                 "options": {
                     "shell": {
                         "executable": "cmd.exe",

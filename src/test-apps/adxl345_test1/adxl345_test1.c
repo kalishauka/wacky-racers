@@ -25,10 +25,6 @@
 #define PACER_RATE 20
 #define ACCEL_POLL_RATE 1
 
-#ifndef LED_ACTIVE
-#define LED_ACTIVE PIO_OUTPUT_LOW
-#endif
-
 static twi_cfg_t adxl345_twi_cfg =
 {
     .channel = TWI_CHANNEL_0,
@@ -100,9 +96,9 @@ int main (void)
     // Redirect stdio to USB serial
     usb_serial_stdio_init ();
 
-    pio_config_set (LED_ERROR_PIO, LED_ACTIVE);
+    pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_LOW);
     pio_output_set (LED_ERROR_PIO, ! LED_ACTIVE);
-    pio_config_set (LED_STATUS_PIO, LED_ACTIVE);
+    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
     pio_output_set (LED_STATUS_PIO, ! LED_ACTIVE);
 
     // Initialise the TWI (I2C) bus for the ADXL345
