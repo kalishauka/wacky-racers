@@ -29,8 +29,8 @@
 #define USB_CURRENT_MA 500
 
 /* LEDs  */
-#define LED_ERROR_PIO PA20_PIO
-#define LED_STATUS_PIO PA23_PIO
+#define LED_ERROR_PIO PB2_PIO
+#define LED_STATUS_PIO PB3_PIO
 
 /* General  */
 #define APPENDAGE_PIO PA1_PIO
@@ -44,9 +44,11 @@
 #define MOTOR_RIGHT_PWM_PIO PA7_PIO
 
 /* Radio  */
-#define RADIO_CS_PIO PA10_PIO
-#define RADIO_CE_PIO PA9_PIO
-#define RADIO_IRQ_PIO PA15_PIO
+#define RADIO_CS_PIO PA15_PIO
+#define RADIO_CE_PIO PA18_PIO
+#define RADIO_IRQ_PIO PA24_PIO
+
+#define RADIO_POWER_ENABLE_PIO PA11_PIO
 
 /* LED tape  */
 #define LEDTAPE_PIO PA16_PIO
