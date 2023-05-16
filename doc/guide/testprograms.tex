@@ -65,6 +65,35 @@ sly. This program should be disabled on the ECE computers. For more
 about this and using other operating systems, see \wikiref{USB
 CDC}{USB CDC}.
 
+The test apps:
+\begin{itemize}
+   \item \wfile{test-apps/usb_serial_test1}
+   \item and \wfile{test-apps/usb_serial_read}
+ \end{itemize}
+both contain examples of \emph{reading} commands from the USB
+interface. This can be useful for debugging: for example you can
+control the motor speed by sending commands to your board via the
+serial interface. To get serial input playing nicely on your
+development machine, you need to enable local echo and use newlines as
+line endings in your serial terminal program. This is configured on
+the aforementioned terminal programs as follows.
+\begin{description}
+  \item[Tera Term] Open the \verb|Setup > Terminal...|
+  menu, check \verb|Local echo|, and set the \verb|New-line| setting
+  to \verb|LF| for transmit and receive. See \reffig{tera-term-setup}.
+
+  \item[gtkterm] In the \verb|Configuration| dropdown menu, make sure
+  \verb|Local echo| and \verb|CR LF auto| are checked.
+\end{description}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{figs/tera-term-setup.png}
+  \caption{Tera Term setup for local echo with newlines (aka line
+  feeds [LF]).}
+  \label{fig:tera-term-setup}
+\end{figure}
+
 \section{PWM}
 \label{pwm-test}
 

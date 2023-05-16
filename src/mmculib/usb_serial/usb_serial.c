@@ -79,7 +79,7 @@ int usb_serial_stdio_init (void)
         };
 
     // Create non-blocking tty device for USB CDC connection.
-    if (!usb_serial_init (&usb_serial_cfg, "/dev/usb_tty"))
+    if (! usb_serial_init (&usb_serial_cfg, "/dev/usb_tty"))
         return -1;
 
     if (! freopen ("/dev/usb_tty", "r", stdin))

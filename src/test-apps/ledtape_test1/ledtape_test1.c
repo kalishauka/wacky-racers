@@ -34,6 +34,10 @@
     * Change the color being set on all the LEDs.
     * Make an interesting pattern.
     * Make the pattern scroll down the LEDs (see ledtape_test2 for an option).
+
+    Troubleshooting: check the frequency of the generated waveform; if it is not
+    close to 800 kHz, adjust the value of LEDTAPE_TPERIOD by defining it in
+    target.h. (See src/mmculib/ledtape/ledtape.h for more info.)
 */
 
 

@@ -730,10 +730,16 @@ If the LED tape does not work:
 \item Check that it is supplied with 5\,V.
 
 \item Check that there is a data signal with 5\,V logic (the level
-  translator may be configured for the wrong direction).
+  translator may be configured for the wrong direction) and a
+  frequency close to the required frequency as specified in the LED
+  controller's datasheet.
 
-\item Change the timing parameter in the LED tape driver.  It appears
-  that some LED tapes have different timing specifications.
+\item If the frequency is off, tune the timing parameter in the LED
+  tape driver (it appears that some LED tapes have different timing
+  specifications). This is done by changing the value of
+  \verb|LEDTAPE_TPERIOD| in \file{target.h}; see
+  \wfile{mmculib/ledtape/ledtape.h} for the default value and more
+  information.
 \end{enumerate}
 
 
