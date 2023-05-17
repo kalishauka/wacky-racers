@@ -75,7 +75,7 @@ void find_motor_PWM(float speed_constant, float left_motor, float right_motor, f
     *PWM_left_motor = speed_constant * left_motor;
 }
 
-int get_PWM (void)
+int main (void)
 {
     twi_t adxl345_twi;
     adxl345_t *adxl345;

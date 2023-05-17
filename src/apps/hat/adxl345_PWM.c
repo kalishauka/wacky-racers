@@ -5,6 +5,7 @@
 */
 
 #include "pio.h"
+#include "stdint.h"
 #include "delay.h"
 #include "target.h"
 #include "pacer.h"
@@ -30,32 +31,37 @@
 #endif
 
 static twi_cfg_t adxl345_twi_cfg =
-{
-    .channel = TWI_CHANNEL_0,
-    .period = TWI_PERIOD_DIVISOR (100000), // 100 kHz
-    .slave_addr = 0
-};
+    {
+        .channel = TWI_CHANNEL_0,
+        .period = TWI_PERIOD_DIVISOR(100000), // 100 kHz
+        .slave_addr = 0};
 
-float map(float value, float fromLow, float fromHigh, float toLow, float toHigh) {
+float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
+{
     return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
 }
 
-float find_speed_constant(float y, float default_Speed, float default_reverse_speed, float *reversing) {
+float find_speed_constant(float y, float default_Speed, float default_reverse_speed, bool *reversing)
+{
     float speed_constant = 0.0;
     float a = 0.0, c = 0.0, d = 0.0;
 
-    if (y < 0.5) {
+    if (y < 0.5)
+    {
         a = default_Speed / 0.25;
         speed_constant = a * pow(y, 2);
         *reversing = 0.0;
-    } else {
+    }
+    else
+    {
         c = -(default_Speed - 1) / 0.5;
         d = 1 - c;
         speed_constant = c * y + d;
         *reversing = 0.0;
     }
 
-    if (speed_constant < 0.1) {
+    if (speed_constant < 0.1)
+    {
         speed_constant = default_reverse_speed;
         *reversing = 1.0;
     }
@@ -63,23 +69,28 @@ float find_speed_constant(float y, float default_Speed, float default_reverse_sp
     return speed_constant;
 }
 
-void find_motor_ratio(float x, float speed_constant, float *left_motor, float *right_motor) {
+void find_motor_ratio(float x, float speed_constant, float *left_motor, float *right_motor)
+{
     *left_motor = 1.0;
     *right_motor = 1.0;
 
-    if (x > 0) {
+    if (x > 0)
+    {
         *right_motor = 1.0 - x;
-    } else {
+    }
+    else
+    {
         *left_motor = 1.0 + x;
     }
 }
 
-void find_motor_PWM(float speed_constant, float left_motor, float right_motor, float *PWM_left_motor, float *PWM_right_motor) {
+void find_motor_PWM(float speed_constant, float left_motor, float right_motor, float *PWM_left_motor, float *PWM_right_motor)
+{
     *PWM_right_motor = speed_constant * right_motor;
     *PWM_left_motor = speed_constant * left_motor;
 }
 
-float* get_PWM (void)
+bool get_PWM(float *left_value, float *right_value, bool *reversing)
 {
     twi_t adxl345_twi;
     adxl345_t *adxl345;
@@ -95,65 +106,66 @@ float* get_PWM (void)
     float left_motor, right_motor;
     float PWM_left_motor, PWM_right_motor;
 
-    float reversing = 0.0;
+    (*reversing) = 0.0;
 
-    float* output_list = malloc(3 * sizeof(float));
-
-    // Redirect stdio to USB serial
-    usb_serial_stdio_init ();
-
-    pio_config_set (LED_ERROR_PIO, LED_ACTIVE);
-    pio_output_set (LED_ERROR_PIO, ! LED_ACTIVE);
-    pio_config_set (LED_STATUS_PIO, LED_ACTIVE);
-    pio_output_set (LED_STATUS_PIO, ! LED_ACTIVE);
+    pio_config_set(LED_ERROR_PIO, LED_ACTIVE);
+    pio_output_set(LED_ERROR_PIO, !LED_ACTIVE);
+    pio_config_set(LED_STATUS_PIO, LED_ACTIVE);
+    pio_output_set(LED_STATUS_PIO, !LED_ACTIVE);
 
     // Initialise the TWI (I2C) bus for the ADXL345
-    adxl345_twi = twi_init (&adxl345_twi_cfg);
+    adxl345_twi = twi_init(&adxl345_twi_cfg);
 
-    if (! adxl345_twi)
-        panic (LED_ERROR_PIO, 1);
+    if (!adxl345_twi)
+        panic(LED_ERROR_PIO, 1);
 
     // Initialise the ADXL345
-    adxl345 = adxl345_init (adxl345_twi, ADXL345_ADDRESS);
+    adxl345 = adxl345_init(adxl345_twi, ADXL345_ADDRESS);
 
-    if (! adxl345)
-        panic (LED_ERROR_PIO, 2);
+    if (!adxl345)
+        panic(LED_ERROR_PIO, 2);
 
-    pacer_init (PACER_RATE);
+    pacer_init(PACER_RATE);
 
     while (1)
     {
         /* Wait until next clock tick.  */
-        pacer_wait ();
+        pacer_wait();
 
         ticks++;
         if (ticks < PACER_RATE / ACCEL_POLL_RATE)
             continue;
         ticks = 0;
 
-        pio_output_toggle (LED_STATUS_PIO);
+        pio_output_toggle(LED_STATUS_PIO);
 
         /* Read in the accelerometer data.  */
-        if (! adxl345_is_ready (adxl345))
+        if (!adxl345_is_ready(adxl345))
         {
             count++;
-            printf ("Waiting for accelerometer to be ready... %d\n", count);
+            printf("Waiting for accelerometer to be ready... %d\n", count);
         }
         else
         {
             int16_t accel[3];
-            if (adxl345_accel_read (adxl345, accel))
+            if (adxl345_accel_read(adxl345, accel))
             {
 
-                if (accel[0] > 160) {
+                if (accel[0] > 160)
+                {
                     accel[0] = 160;
-                } else if (accel[0] < -160) {
+                }
+                else if (accel[0] < -160)
+                {
                     accel[0] = -160;
                 }
 
-                if (accel[1] > 160) {
+                if (accel[1] > 160)
+                {
                     accel[1] = 160;
-                } else if (accel[1] < -160) {
+                }
+                else if (accel[1] < -160)
+                {
                     accel[1] = -160;
                 }
 
@@ -173,16 +185,15 @@ float* get_PWM (void)
                 /* print PWM values to serial monitor*/
                 // printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
 
-                output_list[0] = PWM_left_motor;
-                output_list[1] = PWM_right_motor;
-                output_list[2] = reversing;
+                (*left_value) = PWM_left_motor;
+                (*right_value) = PWM_right_motor;
+                (*reversing) = reversing;
 
-                return output_list;
-
+                return 1;
             }
             else
             {
-                printf ("ERROR: failed to read acceleration\n");
+                return 0;
             }
         }
     }

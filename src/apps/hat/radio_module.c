@@ -1,4 +1,4 @@
-/* File:   radio_tx_test1.c
+/* File:   radio_module.c
    Author: M. P. Hayes, UCECE
    Date:   24 Feb 2018
 */
@@ -13,7 +13,7 @@
 #define RADIO_ADDRESS 0x0123456789LL
 #define RADIO_PAYLOAD_SIZE 32
 
-int main(void)
+void send_data(void)
 {
     spi_cfg_t spi_cfg =
         {

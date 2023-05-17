@@ -3,15 +3,12 @@
     "makeNumJobs": "2",
     "files.associations": {
         "nrf24.h": "c",
-<<<<<<< HEAD
         "adxl345.h": "c",
         "adxl345_test1.h": "c",
-        "target.h": "c"
-    }
-=======
+        "target.h": "c",
         "usb_serial.h": "c",
         "pwm.h": "c"
     },
-    "C_Cpp.errorSquiggles": "enabled"
->>>>>>> efba5888bd7f47b135de3e9d2b51fc4b9963ef93
+    "C_Cpp.errorSquiggles": "enabled",
+    "editor.formatOnSave": true,
 }

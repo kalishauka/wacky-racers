@@ -14,8 +14,11 @@
                 "${workspaceFolder}/src/boards/hat",
                 "${workspaceFolder}/src/mat91lib/sam4s/**",
                 "${workspaceFolder}/src/mat91lib/**",
-                "${workspaceFolder}/src/mmculib/**"
-            ]
+                "${workspaceFolder}/src/mmculib/**",
+                "C:\\ence461\\tool-chain\\gcc-arm-none-eabi-9-2019-q4\\arm-none-eabi\\include",
+                "C:\\ence461\\tool-chain\\gcc-arm-none-eabi-9-2019-q4\\lib\\gcc\\arm-none-eabi\\9.2.1\\include"
+            ],
+            "configurationProvider": "ms-vscode.makefile-tools"
         },
         {
             "name": "racer",
@@ -31,9 +34,10 @@
                 "${workspaceFolder}/src/boards/racer",
                 "${workspaceFolder}/src/mat91lib/sam4s/**",
                 "${workspaceFolder}/src/mat91lib/**",
-                "${workspaceFolder}/src/mmculib/**"
-            ],
-            "configurationProvider": "ms-vscode.makefile-tools"
+                "${workspaceFolder}/src/mmculib/**",
+                "C:\\ence461\\tool-chain\\gcc-arm-none-eabi-9-2019-q4\\arm-none-eabi\\include",
+                "C:\\ence461\\tool-chain\\gcc-arm-none-eabi-9-2019-q4\\lib\\gcc\\arm-none-eabi\\9.2.1\\include"
+            ]
         }
     ],
     "version": 4
