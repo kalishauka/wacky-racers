@@ -16,13 +16,6 @@
 #define LED_ACTIVE PIO_OUTPUT_LOW
 #endif
 
-struct motor_values_t
-{
-    float right_motor;
-    float left_motor;
-    bool reversing;
-};
-
 float map(float value, float fromLow, float fromHigh, float toLow, float toHigh);
 float find_speed_constant(float y, float default_Speed, float default_reverse_speed, bool *reversing);
 void find_motor_ratio(float x, float speed_constant, float *left_motor, float *right_motor);
