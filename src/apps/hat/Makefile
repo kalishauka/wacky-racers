@@ -1,6 +1,6 @@
 PERIPHERALS = pit
-DRIVERS = pacer usb_serial adxl345 panic
-SRC = hat.c adxl345_PWM.c
+DRIVERS = pacer usb_serial adxl345 panic nrf24
+SRC = hat.c adxl345_PWM.c radio_module.c
 
 # Use low level of optimisation to simplify debugging
 OPT = -O1

@@ -9,12 +9,9 @@
 #include "delay.h"
 #include "panic.h"
 #include "adxl345_PWM.h"
+#include "radio_module.h"
 
-#define RADIO_CHANNEL 4
-#define RADIO_ADDRESS 0x0123456789LL
-#define RADIO_PAYLOAD_SIZE 32
-
-void send_data(motor_values_t *motor_data) 
+void send_data(float left_value, float right_value, bool reversing)
 {
     spi_cfg_t spi_cfg =
         {
@@ -33,7 +30,7 @@ void send_data(motor_values_t *motor_data)
             .irq_pio = RADIO_IRQ_PIO,
             .spi = spi_cfg,
         };
-        
+
     uint8_t count = 0;
     nrf24_t *nrf;
 
@@ -61,7 +58,7 @@ void send_data(motor_values_t *motor_data)
 
         // print struct to buffer
 
-        snprintf(buffer, sizeof(buffer), motor_data \r\n", count++);
+        snprintf(buffer, sizeof(buffer), "%.2f %.2f %d", left_value, right_value, reversing);
 
         if (!nrf24_write(nrf, buffer, RADIO_PAYLOAD_SIZE))
             pio_output_set(LED_ERROR_PIO, 0);
