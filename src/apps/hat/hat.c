@@ -6,6 +6,7 @@ int main(void)
 {
     // TODO: write hat program here...
     usb_serial_stdio_init();
+    radio_init();
 
     while (1)
     {
@@ -14,11 +15,17 @@ int main(void)
         bool reversing = false;
 
         bool res = get_PWM(&left_value, &right_value, &reversing);
+
         if (res)
         {
-            printf("Left Motor: %f || Right Motor: %f || Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
 
-            send_data(left_value, right_value, reversing);
+            // motor_data.left_motor, motor_data.right_motor, motor_data.reversing
+            radio_payload_t motor_data = {left_value, right_value, reversing};
+
+            printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
+
+            // radio_send_data(&motor_data);
+            //, right_value, reversing
         }
     }
 }

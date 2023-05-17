@@ -2,6 +2,7 @@
    Author: M. P. Hayes, UCECE
    Date:   24 Feb 2018
 */
+#include <stdint.h>
 #include "nrf24.h"
 #include "pio.h"
 #include "pacer.h"
@@ -11,7 +12,9 @@
 #include "adxl345_PWM.h"
 #include "radio_module.h"
 
-void send_data(float left_value, float right_value, bool reversing)
+static nrf24_t *nrf_handle;
+
+void radio_init()
 {
     spi_cfg_t spi_cfg =
         {
@@ -31,9 +34,6 @@ void send_data(float left_value, float right_value, bool reversing)
             .spi = spi_cfg,
         };
 
-    uint8_t count = 0;
-    nrf24_t *nrf;
-
     // Configure LED PIO as output.
     pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_LOW);
     pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_HIGH);
@@ -45,24 +45,35 @@ void send_data(float left_value, float right_value, bool reversing)
     delay_ms(10);
 #endif
 
-    nrf = nrf24_init(&nrf24_cfg);
-    if (!nrf)
-        panic(LED_ERROR_PIO, 2);
-
-    while (1)
+    nrf_handle = nrf24_init(&nrf24_cfg);
+    if (!nrf_handle)
     {
-        char buffer[RADIO_PAYLOAD_SIZE + 1];
+        panic(LED_ERROR_PIO, 2);
+    }
+}
 
-        pacer_wait();
-        pio_output_toggle(LED_STATUS_PIO);
+void radio_send_data(radio_payload_t *payload)
+{
 
-        // print struct to buffer
+    //, float right_value, bool reversing
 
-        snprintf(buffer, sizeof(buffer), "%.2f %.2f %d", left_value, right_value, reversing);
+    char buffer[RADIO_PAYLOAD_SIZE + 1];
 
-        if (!nrf24_write(nrf, buffer, RADIO_PAYLOAD_SIZE))
-            pio_output_set(LED_ERROR_PIO, 0);
-        else
-            pio_output_set(LED_ERROR_PIO, 1);
+    pacer_wait();
+    pio_output_toggle(LED_STATUS_PIO);
+
+    // print struct to buffer
+
+    // snprintf(buffer, sizeof(buffer), "%.2f", left_value);
+    //"%.2f %.2f %d", left_value, right_value, reversing
+    uint8_t status = nrf24_write(nrf_handle, payload, sizeof(radio_payload_t));
+    if (!nrf24_write(nrf_handle, buffer, RADIO_PAYLOAD_SIZE))
+
+    {
+        pio_output_set(LED_ERROR_PIO, 0);
+    }
+    else
+    {
+        pio_output_set(LED_ERROR_PIO, 1);
     }
 }
