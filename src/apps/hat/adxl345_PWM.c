@@ -50,20 +50,20 @@ float find_speed_constant(float y, float default_Speed, float default_reverse_sp
     {
         a = default_Speed / 0.25;
         speed_constant = a * pow(y, 2);
-        *reversing = 0.0;
+        *reversing = 0;
     }
     else
     {
         c = -(default_Speed - 1) / 0.5;
         d = 1 - c;
         speed_constant = c * y + d;
-        *reversing = 0.0;
+        *reversing = 0;
     }
 
     if (speed_constant < 0.1)
     {
         speed_constant = default_reverse_speed;
-        *reversing = 1.0;
+        *reversing = 1;
     }
 
     return speed_constant;
@@ -84,10 +84,10 @@ void find_motor_ratio(float x, float speed_constant, float *left_motor, float *r
     }
 }
 
-void find_motor_PWM(float speed_constant, float left_motor, float right_motor, float *PWM_left_motor, float *PWM_right_motor)
+void find_motor_PWM(float speed_constant, float left_motor, float right_motor, float *left_value, float *right_value)
 {
-    *PWM_right_motor = speed_constant * right_motor;
-    *PWM_left_motor = speed_constant * left_motor;
+    *right_value = speed_constant * right_motor;
+    *left_value = speed_constant * left_motor;
 }
 
 bool get_PWM(float *left_value, float *right_value, bool *reversing)
@@ -104,9 +104,6 @@ bool get_PWM(float *left_value, float *right_value, bool *reversing)
     float speed_constant;
     float PWM_value;
     float left_motor, right_motor;
-    float PWM_left_motor, PWM_right_motor;
-
-    (*reversing) = 0.0;
 
     pio_config_set(LED_ERROR_PIO, LED_ACTIVE);
     pio_output_set(LED_ERROR_PIO, !LED_ACTIVE);
@@ -174,20 +171,16 @@ bool get_PWM(float *left_value, float *right_value, bool *reversing)
                 y = map(accel[1], -160, 160, 0, 1);
 
                 /* Find speed constant from y value of accelerometer*/
-                speed_constant = find_speed_constant(y, default_speed, default_reverse_speed, &reversing);
+                speed_constant = find_speed_constant(y, default_speed, default_reverse_speed, reversing);
 
                 /* Find motor ratio from x value of accelerometer*/
                 find_motor_ratio(x, speed_constant, &left_motor, &right_motor);
 
                 /* Find PWM values for each motor*/
-                find_motor_PWM(speed_constant, left_motor, right_motor, &PWM_left_motor, &PWM_right_motor);
+                find_motor_PWM(speed_constant, left_motor, right_motor, left_value, right_value);
 
                 /* print PWM values to serial monitor*/
                 // printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
-
-                (*left_value) = PWM_left_motor;
-                (*right_value) = PWM_right_motor;
-                (*reversing) = reversing;
 
                 return 1;
             }

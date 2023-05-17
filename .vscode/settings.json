@@ -7,7 +7,8 @@
         "adxl345_test1.h": "c",
         "target.h": "c",
         "usb_serial.h": "c",
-        "pwm.h": "c"
+        "pwm.h": "c",
+        "adxl345_pwm.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "editor.formatOnSave": true,
