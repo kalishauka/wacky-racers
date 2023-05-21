@@ -9,8 +9,6 @@
 #include "pacer.h"
 #include "ledbuffer.h"
 
-#define NUM_LEDS 15
-
 /*
     This is an alternative method for driving the LED tape using the ledbuffer
     module that is included in the ledtape driver.
@@ -25,13 +23,12 @@
     target.h. (See src/mmculib/ledtape/ledtape.h for more info.)
 */
 
-int
-main (void)
+int main(void)
 {
     bool blue = false;
     int count = 0;
 
-    ledbuffer_t *leds = ledbuffer_init (LEDTAPE_PIO, NUM_LEDS);
+    ledbuffer_t *leds = ledbuffer_init(LEDTAPE_PIO, NUM_LEDS);
 
     pacer_init(30);
 
@@ -57,7 +54,7 @@ main (void)
             count = 0;
         }
 
-        ledbuffer_write (leds);
-        ledbuffer_advance (leds, 1);
+        ledbuffer_write(leds);
+        ledbuffer_advance(leds, 1);
     }
 }

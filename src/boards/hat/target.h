@@ -36,7 +36,7 @@
 #define ADXL345_ADDRESS 0x53
 
 /* LEDs  */
-#define LED_ERROR_PIO PA1_PIO 
+#define LED_ERROR_PIO PA1_PIO
 #define LED_STATUS_PIO PA0_PIO
 
 /* Button  */
@@ -59,6 +59,7 @@
 
 /* LED tape  */
 #define LEDTAPE_PIO PA8_PIO
+#define NUM_LEDS 22
 
 /* Buzzer */
 #define BUZZER_PIO PA2_PIO

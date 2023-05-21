@@ -9,7 +9,11 @@
         "usb_serial.h": "c",
         "pwm.h": "c",
         "adxl345_pwm.h": "c",
-        "radio_module.h": "c"
+        "radio_module.h": "c",
+        "ledbuffer.h": "c",
+        "ledtape_utils.h": "c",
+        "pacer.h": "c",
+        "cstdlib": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "editor.formatOnSave": true,

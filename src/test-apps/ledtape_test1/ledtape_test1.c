@@ -9,8 +9,6 @@
 #include "pacer.h"
 #include "ledtape.h"
 
-#define NUM_LEDS 20
-
 /*
     This test app shows how to program the WS2318B LED tape.
     In this example the ledtape_write() function is used to send the appropriate
@@ -40,9 +38,7 @@
     target.h. (See src/mmculib/ledtape/ledtape.h for more info.)
 */
 
-
-int
-main (void)
+int main(void)
 {
     uint8_t leds[NUM_LEDS * 3];
     int i;
@@ -61,6 +57,6 @@ main (void)
     {
         pacer_wait();
 
-        ledtape_write (LEDTAPE_PIO, leds, NUM_LEDS * 3);
+        ledtape_write(LEDTAPE_PIO, leds, NUM_LEDS * 3);
     }
 }
