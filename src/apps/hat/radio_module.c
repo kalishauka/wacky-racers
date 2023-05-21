@@ -55,8 +55,6 @@ void radio_init()
 void radio_send_data(radio_payload_t *payload)
 {
 
-    //, float right_value, bool reversing
-
     char buffer[RADIO_PAYLOAD_SIZE + 1];
 
     pacer_wait();
@@ -67,7 +65,7 @@ void radio_send_data(radio_payload_t *payload)
     // snprintf(buffer, sizeof(buffer), "%.2f", left_value);
     //"%.2f %.2f %d", left_value, right_value, reversing
     uint8_t status = nrf24_write(nrf_handle, payload, sizeof(radio_payload_t));
-    if (!nrf24_write(nrf_handle, buffer, RADIO_PAYLOAD_SIZE))
+    if (!nrf24_write(nrf_handle, payload, sizeof(radio_payload_t)))
 
     {
         pio_output_set(LED_ERROR_PIO, 0);
