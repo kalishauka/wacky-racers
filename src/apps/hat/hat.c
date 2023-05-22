@@ -1,8 +1,10 @@
 #include "target.h"
+#include <stdio.h>
 #include "adxl345_PWM.h"
 #include "radio_module.h"
 #include "ledtape_utils.h"
 #include "ledbuffer.h"
+#include "battery_level.h"
 
 int main(void)
 {
@@ -16,27 +18,24 @@ int main(void)
     float right_value = 0;
     bool reversing = false;
 
-    bool blue = false;
     int count = 0;
 
     // ledbuffer_t *leds = ledbuffer_init(LEDTAPE_PIO, NUM_LEDS);
 
     uint8_t leds_seq[NUM_LEDS * 3];
 
-    int i;
-
-    for (i = 0; i < NUM_LEDS; i++)
-    {
-        // Set full green  GRB order
-        leds_seq[i * 3] = 255;
-        leds_seq[i * 3 + 1] = 50;
-        leds_seq[i * 3 + 2] = 150;
-    }
-
     pacer_init(30);
 
     while (1)
     {
+
+        count++;
+
+        if (count % 15 == 0)
+        {
+
+            check_battery_level();
+        }
         if (get_PWM(&left_value, &right_value, &reversing))
         {
             // motor_data.left_motor, motor_data.right_motor, motor_data.reversing
@@ -47,8 +46,6 @@ int main(void)
             printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
 
             radio_send_data(&motor_data);
-
-            // set_pattern(&count, leds, &blue);
 
             set_pattern_simple(leds_seq);
         }

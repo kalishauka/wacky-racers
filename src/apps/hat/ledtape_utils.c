@@ -54,9 +54,8 @@ void set_pattern_simple(uint8_t *leds_seq)
 {
 
     pacer_wait();
-    int i = 0;
 
-    for (i = 0; i < NUM_LEDS; i++)
+    for (int i = 0; i < NUM_LEDS; i++)
     {
         // Set full green  GRB order
         leds_seq[i * 3] = rand() % (255 + 1 - 0) + 0;
