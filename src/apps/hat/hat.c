@@ -32,7 +32,7 @@ int main(void)
     int ticks = 0;
     int count = 0;
     bool bump;
-    buzzer_beep();
+    // buzzer_beep();
 
     twi_t adxl345_twi;
     adxl345_t *adxl345;
@@ -51,10 +51,10 @@ int main(void)
 
     while (1)
     {
+        count++;
+
         delay_ms(1);
         bool battery_good = check_battery_level(&adc);
-
-        printf(" %d \n", 1);
 
         // buzzer_update();
 
@@ -62,6 +62,7 @@ int main(void)
 
         if (count % 15 == 0)
         {
+
             bump = recieve_radio_data();
         }
 
@@ -85,8 +86,6 @@ int main(void)
             printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
 
             radio_send_data(&motor_data);
-
-            printf("%d \n", 2);
         }
     }
 }

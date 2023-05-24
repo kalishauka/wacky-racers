@@ -20,13 +20,12 @@ adc_t battery_init(adc_t adc)
 
 bool check_battery_level(adc_t *adc)
 {
-    int count = 0;
     uint16_t data[1];
     bool result;
 
     adc_read(*adc, data, sizeof(data));
 
-    if (*data < VOLTAGE_THRESHOLD)
+    if (data[0] < VOLTAGE_THRESHOLD)
     {
         pio_output_high(LED_STATUS_PIO);
         result = 0;
@@ -37,7 +36,7 @@ bool check_battery_level(adc_t *adc)
         result = 1;
     }
 
-    printf("%3d: %d\n", count++, *data);
+    // printf("%d\n", data[0]);
 
     return result;
 }

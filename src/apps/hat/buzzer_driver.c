@@ -74,7 +74,6 @@ void buzzer_init(void)
     if (!pwm4)
     {
         panic(LED_ERROR_PIO, 10);
-        printf("buzzer fuck %d\n", 69);
     }
 
     pwm_start(pwm4);
@@ -82,8 +81,8 @@ void buzzer_init(void)
 
 void buzzer_beep(void)
 {
+    
     piezo_beep_long(piezo);
-    printf("im here %d \n", 69);
 }
 
 void buzzer_update(void)
