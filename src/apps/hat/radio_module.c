@@ -61,6 +61,13 @@ void radio_init()
     }
 }
 
+bool recieve_radio_data(void)
+{
+    char buffer[2];
+    uint8_t bytes_read = nrf24_read(nrf_handle, buffer, 2);
+    return bytes_read == 0 ? false : true;
+}
+
 void radio_send_data(radio_payload_t *payload)
 {
 

@@ -6,7 +6,7 @@
 #include "ledtape_utils.h"
 #include "ledbuffer.h"
 #include "battery_level.h"
-// #include "buzzer_driver.h"
+#include "buzzer_driver.h"
 #include "usb_serial.h"
 #include "delay.h"
 #include "pio.h"
@@ -15,9 +15,10 @@ int main(void)
 {
     usb_serial_stdio_init();
     radio_init();
+
     adc_t adc;
     adc = battery_init(adc);
-    // buzzer_init();
+    buzzer_init();
     pacer_init(1000);
 
     radio_payload_t motor_data;
@@ -29,8 +30,9 @@ int main(void)
     uint8_t leds_seq[NUM_LEDS * 3];
 
     int ticks = 0;
-
-    // buzzer_beep();
+    int count = 0;
+    bool bump;
+    buzzer_beep();
 
     twi_t adxl345_twi;
     adxl345_t *adxl345;
@@ -55,7 +57,18 @@ int main(void)
         printf(" %d \n", 1);
 
         // buzzer_update();
+
         set_pattern_simple(leds_seq);
+
+        if (count % 15 == 0)
+        {
+            bump = recieve_radio_data();
+        }
+
+        if (bump)
+        {
+            // play song
+        }
 
         ticks++;
         if (ticks < PACER_RATE / ACCEL_POLL_RATE)
