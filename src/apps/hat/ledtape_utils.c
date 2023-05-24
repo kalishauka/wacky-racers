@@ -5,10 +5,12 @@
 */
 
 #include <pio.h>
+#include <stdlib.h>
 #include "target.h"
 #include "pacer.h"
 #include "ledtape_utils.h"
 #include "ledbuffer.h"
+#include "ledtape.h"
 
 /*
     This is an alternative method for driving the LED tape using the ledbuffer
