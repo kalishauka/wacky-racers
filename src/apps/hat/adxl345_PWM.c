@@ -3,7 +3,7 @@
    Date:   6 May 2023
    Descr:  Read from an ADXL345 accelerometer, transforms into motor PWM's and write its output to the USB serial.
 */
-
+#include <stdlib.h>
 #include "pio.h"
 #include "stdint.h"
 #include "delay.h"
@@ -29,12 +29,6 @@
 #ifndef LED_ACTIVE
 #define LED_ACTIVE PIO_OUTPUT_LOW
 #endif
-
-static twi_cfg_t adxl345_twi_cfg =
-    {
-        .channel = TWI_CHANNEL_0,
-        .period = TWI_PERIOD_DIVISOR(100000), // 100 kHz
-        .slave_addr = 0};
 
 float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
 {
@@ -90,11 +84,10 @@ void find_motor_PWM(float speed_constant, float left_motor, float right_motor, f
     *left_value = speed_constant * left_motor;
 }
 
-bool get_PWM(float *left_value, float *right_value, bool *reversing)
+bool get_PWM(float *left_value, float *right_value, bool *reversing, adxl345_t *adxl345)
 {
-    twi_t adxl345_twi;
-    adxl345_t *adxl345;
-    int ticks = 0;
+
+    bool res;
     int count = 0;
 
     float default_speed = 0.7;
@@ -105,89 +98,67 @@ bool get_PWM(float *left_value, float *right_value, bool *reversing)
     float PWM_value;
     float left_motor, right_motor;
 
-    pio_config_set(LED_ERROR_PIO, LED_ACTIVE);
-    pio_output_set(LED_ERROR_PIO, !LED_ACTIVE);
-    pio_config_set(LED_STATUS_PIO, LED_ACTIVE);
-    pio_output_set(LED_STATUS_PIO, !LED_ACTIVE);
+    /* Wait until next clock tick.  */
+    pacer_wait();
 
-    // Initialise the TWI (I2C) bus for the ADXL345
-    adxl345_twi = twi_init(&adxl345_twi_cfg);
+    pio_output_toggle(LED_STATUS_PIO);
 
-    if (!adxl345_twi)
-        panic(LED_ERROR_PIO, 1);
-
-    // Initialise the ADXL345
-    adxl345 = adxl345_init(adxl345_twi, ADXL345_ADDRESS);
-
-    if (!adxl345)
-        panic(LED_ERROR_PIO, 2);
-
-    pacer_init(PACER_RATE);
-
-    while (1)
+    /* Read in the accelerometer data.  */
+    if (!adxl345_is_ready(adxl345))
     {
-        /* Wait until next clock tick.  */
-        pacer_wait();
-
-        ticks++;
-        if (ticks < PACER_RATE / ACCEL_POLL_RATE)
-            continue;
-        ticks = 0;
-
-        pio_output_toggle(LED_STATUS_PIO);
-
-        /* Read in the accelerometer data.  */
-        if (!adxl345_is_ready(adxl345))
+        count++;
+        printf("Waiting for accelerometer to be ready... %d\n", count);
+        res = 0;
+    }
+    else
+    {
+        int16_t accel[3];
+        if (adxl345_accel_read(adxl345, accel))
         {
-            count++;
-            printf("Waiting for accelerometer to be ready... %d\n", count);
+
+            if (accel[0] > 160)
+            {
+                accel[0] = 160;
+            }
+            else if (accel[0] < -160)
+            {
+                accel[0] = -160;
+            }
+
+            if (accel[1] > 160)
+            {
+                accel[1] = 160;
+            }
+            else if (accel[1] < -160)
+            {
+                accel[1] = -160;
+            }
+
+            /* Standardize accelerometer values for easy transformation into PWM*/
+            x = map(accel[0], -160, 160, -1, 1);
+            y = map(accel[1], -160, 160, 0, 1);
+
+            /* Find speed constant from y value of accelerometer*/
+            speed_constant = find_speed_constant(y, default_speed, default_reverse_speed, reversing);
+
+            /* Find motor ratio from x value of accelerometer*/
+            find_motor_ratio(x, speed_constant, &left_motor, &right_motor);
+
+            /* Find PWM values for each motor*/
+            find_motor_PWM(speed_constant, left_motor, right_motor, left_value, right_value);
+
+            /* print PWM values to serial monitor*/
+            // printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
+
+            res = 1;
         }
         else
         {
-            int16_t accel[3];
-            if (adxl345_accel_read(adxl345, accel))
-            {
+            printf(" %d \n", 3);
 
-                if (accel[0] > 160)
-                {
-                    accel[0] = 160;
-                }
-                else if (accel[0] < -160)
-                {
-                    accel[0] = -160;
-                }
-
-                if (accel[1] > 160)
-                {
-                    accel[1] = 160;
-                }
-                else if (accel[1] < -160)
-                {
-                    accel[1] = -160;
-                }
-
-                /* Standardize accelerometer values for easy transformation into PWM*/
-                x = map(accel[0], -160, 160, -1, 1);
-                y = map(accel[1], -160, 160, 0, 1);
-
-                /* Find speed constant from y value of accelerometer*/
-                speed_constant = find_speed_constant(y, default_speed, default_reverse_speed, reversing);
-
-                /* Find motor ratio from x value of accelerometer*/
-                find_motor_ratio(x, speed_constant, &left_motor, &right_motor);
-
-                /* Find PWM values for each motor*/
-                find_motor_PWM(speed_constant, left_motor, right_motor, left_value, right_value);
-
-                /* print PWM values to serial monitor*/
-                // printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
-
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            res = 0;
         }
     }
+
+    return res;
 }

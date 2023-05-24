@@ -15,11 +15,6 @@ int main(void)
 
     pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_LOW);
     pio_output_set(LED_ERROR_PIO, !PIO_OUTPUT_HIGH);
-
-
-
-    
-
     
     // Redirect stdio to USB serial
     usb_serial_stdio_init();

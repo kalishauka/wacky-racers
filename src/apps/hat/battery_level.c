@@ -1,41 +1,32 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "usb_serial.h"
 #include "adc.h"
 #include "pacer.h"
 #include "panic.h"
 #include "battery_level.h"
 
-adc_t battery_init(void)
+adc_t battery_init(adc_t adc)
 {
 
-    adc_t adc;
-
     pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_HIGH);
-
-    // Redirect stdio to USB serial
-    usb_serial_stdio_init();
 
     adc = adc_init(&adc_cfg);
     if (!adc)
         panic(LED_ERROR_PIO, 1);
 
-    pacer_init(2);
-
     return adc;
 }
 
-bool check_battery_level(adc_t adc)
+bool check_battery_level(adc_t *adc)
 {
     int count = 0;
-    float data[1];
-
-    pacer_wait();
-
+    uint16_t data[1];
     bool result;
 
-    adc_read(adc, data, sizeof(data));
+    adc_read(*adc, data, sizeof(data));
 
-    if (data[0] < VOLTAGE_THRESHOLD)
+    if (*data < VOLTAGE_THRESHOLD)
     {
         pio_output_high(LED_STATUS_PIO);
         result = 0;
@@ -46,7 +37,7 @@ bool check_battery_level(adc_t adc)
         result = 1;
     }
 
-    printf("%3d: %f\n", count++, data[0]);
+    printf("%3d: %d\n", count++, *data);
 
     return result;
 }

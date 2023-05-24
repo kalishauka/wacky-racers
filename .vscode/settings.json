@@ -17,7 +17,13 @@
         "adc.h": "c",
         "mat91lib.h": "c",
         "battery_level.h": "c",
-        "pio.h": "c"
+        "pio.h": "c",
+        "buzzer_driver.h": "c",
+        "stdlib.h": "c",
+        "mmelody.h": "c",
+        "piezo_beep.h": "c",
+        "ledtape.h": "c",
+        "panic.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "editor.formatOnSave": true,

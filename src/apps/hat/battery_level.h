@@ -7,9 +7,9 @@
 #include "pacer.h"
 #include "panic.h"
 
-#define VOLTAGE_THRESHOLD 5
+#define VOLTAGE_THRESHOLD 2665
 
-adc_t battery_init(void);
+adc_t battery_init(adc_t adc);
 
 static const adc_cfg_t adc_cfg = {
     .bits = 12,
@@ -17,6 +17,6 @@ static const adc_cfg_t adc_cfg = {
     .trigger = ADC_TRIGGER_SW,
     .clock_speed_kHz = 1000};
 
-bool check_battery_level(adc_t adc);
+bool check_battery_level(adc_t *adc);
 
 #endif /* BATTERY_LEVEL_H */

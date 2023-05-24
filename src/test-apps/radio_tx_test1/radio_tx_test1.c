@@ -57,7 +57,7 @@ int main(void)
         pacer_wait();
         pio_output_toggle(LED_STATUS_PIO);
 
-        snprintf(buffer, sizeof(buffer), "0.10 0.40 0 %d\r\n", count++);
+        snprintf(buffer, sizeof(buffer), "Hello Merle and Luke", count++);
 
         if (!nrf24_write(nrf, buffer, RADIO_PAYLOAD_SIZE))
             pio_output_set(LED_ERROR_PIO, 0);
