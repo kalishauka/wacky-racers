@@ -5,10 +5,10 @@
 #include "panic.h"
 #include "battery_level.h"
 
-void check_battery_level(void)
+adc_t battery_init(void)
 {
+
     adc_t adc;
-    int count = 0;
 
     pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_HIGH);
 
@@ -19,15 +19,28 @@ void check_battery_level(void)
     if (!adc)
         panic(LED_ERROR_PIO, 1);
 
-    pacer_init(PACER_RATE);
-    while (1)
+    pacer_init(2);
+
+    return adc;
+}
+
+void check_battery_level(adc_t adc)
+{
+    int count = 0;
+    float data[1];
+
+    pacer_wait();
+
+    adc_read(adc, data, sizeof(data));
+
+    if (data[0] < VOLTAGE_THRESHOLD)
     {
-        float data[10];
-
-        pacer_wait();
-
-        adc_read(adc, data, sizeof(data));
-        printf("%3d: %f\n", count++, data);
-        pio_output_toggle(LED_STATUS_PIO);
+        pio_output_high(LED_STATUS_PIO);
     }
+    else
+    {
+        pio_output_low(LED_STATUS_PIO);
+    }
+
+    printf("%3d: %f\n", count++, data[0]);
 }

@@ -16,7 +16,8 @@
         "cstdlib": "c",
         "adc.h": "c",
         "mat91lib.h": "c",
-        "battery_level.h": "c"
+        "battery_level.h": "c",
+        "pio.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "editor.formatOnSave": true,

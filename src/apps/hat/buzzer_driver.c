@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include "usb_serial.h"
 #include <string.h>
+#include "piezo.h"
+#include "piezo_beep.h"
+#include "mmelody.h"
 
 
 #define PWM4_PIO PA2_PIO

@@ -11,6 +11,7 @@ int main(void)
     // TODO: write hat program here...
     usb_serial_stdio_init();
     radio_init();
+    adc_t adc = battery_init();
 
     radio_payload_t motor_data;
 
@@ -29,13 +30,15 @@ int main(void)
     while (1)
     {
 
+        check_battery_level(adc);
         count++;
 
-        if (count % 15 == 0)
+        /*if (count % 1 == 0)
         {
 
-            check_battery_level();
-        }
+            check_battery_level(adc);
+        }*/
+
         if (get_PWM(&left_value, &right_value, &reversing))
         {
             // motor_data.left_motor, motor_data.right_motor, motor_data.reversing

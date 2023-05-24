@@ -17,78 +17,14 @@ static nrf24_t *nrf_handle;
 void radio_init()
 
 {
-    char channel_id[4];
-    sprintf(channel_id, "%d%d%d%d", pio_input_get(RADIO_CH0_PIO), pio_input_get(RADIO_CH1_PIO), pio_input_get(RADIO_CH2_PIO), pio_input_get(RADIO_CH3_PIO));
-    int channel;
-
-    if (channel_id == "0000")
-    {
-        channel = 0;
-    }
-    else if (channel_id == "0001")
-    {
+    char channel_id[5];
+     sprintf(channel_id, "%d%d%d%d", pio_input_get(RADIO_CH0_PIO), pio_input_get(RADIO_CH1_PIO), pio_input_get(RADIO_CH2_PIO), pio_input_get(RADIO_CH3_PIO));
+     int channel = (int) strtol(channel_id, NULL, 2);
+     if(channel == 0){
         channel = 1;
-    }
-    else if (channel_id == "0010")
-    {
-        channel = 2;
-    }
-    else if (channel_id == "0011")
-    {
-        channel = 3;
-    }
-    else if (channel_id == "0100")
-    {
-        channel = 4;
-    }
-    else if (channel_id == "0101")
-    {
-        channel = 5;
-    }
-    else if (channel_id == "0110")
-    {
-        channel = 6;
-    }
-    else if (channel_id == "0111")
-    {
-        channel = 7;
-    }
-    else if (channel_id == "1000")
-    {
-        channel = 8;
-    }
-    else if (channel_id == "1001")
-    {
-        channel = 9;
-    }
-    else if (channel_id == "1010")
-    {
-        channel = 10;
-    }
-    else if (channel_id == "1011")
-    {
-        channel = 11;
-    }
-    else if (channel_id == "1100")
-    {
-        channel = 12;
-    }
-    else if (channel_id == "1101")
-    {
-        channel = 13;
-    }
-    else if (channel_id == "1110")
-    {
-        channel = 14;
-    }
-    else if (channel_id == "1111")
-    {
-        channel = 15;
-    }
-    else
-    {
-        channel = 0;
-    }
+     }
+
+     
 
     spi_cfg_t spi_cfg =
         {
@@ -132,7 +68,7 @@ void radio_send_data(radio_payload_t *payload)
     char buffer[RADIO_PAYLOAD_SIZE + 1];
 
     pacer_wait();
-    pio_output_toggle(LED_STATUS_PIO);
+    // pio_output_toggle(LED_STATUS_PIO);
 
     // print struct to buffer
 
