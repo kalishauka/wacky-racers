@@ -30,8 +30,8 @@ int main(void)
     while (1)
     {
 
-        check_battery_level(adc);
-        count++;
+        bool battery_good = check_battery_level(adc);
+        // count++;
 
         /*if (count % 1 == 0)
         {

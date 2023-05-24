@@ -24,23 +24,29 @@ adc_t battery_init(void)
     return adc;
 }
 
-void check_battery_level(adc_t adc)
+bool check_battery_level(adc_t adc)
 {
     int count = 0;
     float data[1];
 
     pacer_wait();
 
+    bool result;
+
     adc_read(adc, data, sizeof(data));
 
     if (data[0] < VOLTAGE_THRESHOLD)
     {
         pio_output_high(LED_STATUS_PIO);
+        result = 0;
     }
     else
     {
         pio_output_low(LED_STATUS_PIO);
+        result = 1;
     }
 
     printf("%3d: %f\n", count++, data[0]);
+
+    return result;
 }

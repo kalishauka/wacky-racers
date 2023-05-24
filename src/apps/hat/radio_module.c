@@ -17,14 +17,13 @@ static nrf24_t *nrf_handle;
 void radio_init()
 
 {
-    char channel_id[5];
-     sprintf(channel_id, "%d%d%d%d", pio_input_get(RADIO_CH0_PIO), pio_input_get(RADIO_CH1_PIO), pio_input_get(RADIO_CH2_PIO), pio_input_get(RADIO_CH3_PIO));
-     int channel = (int) strtol(channel_id, NULL, 2);
-     if(channel == 0){
+    /*char channel_id[5];
+    sprintf(channel_id, "%d%d%d%d", pio_input_get(RADIO_CH0_PIO), pio_input_get(RADIO_CH1_PIO), pio_input_get(RADIO_CH2_PIO), pio_input_get(RADIO_CH3_PIO));
+    int channel = (int)strtol(channel_id, NULL, 2);
+    if (channel == 0)
+    {
         channel = 1;
-     }
-
-     
+    }*/
 
     spi_cfg_t spi_cfg =
         {
@@ -36,7 +35,7 @@ void radio_init()
             .bits = 8};
     nrf24_cfg_t nrf24_cfg =
         {
-            .channel = channel,
+            .channel = 14,
             .address = RADIO_ADDRESS,
             .payload_size = RADIO_PAYLOAD_SIZE,
             .ce_pio = RADIO_CE_PIO,
