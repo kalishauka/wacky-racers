@@ -12,22 +12,22 @@
 #include "adxl345_PWM.h"
 #include "radio_module.h"
 
-static nrf24_t *nrf_handle;
+
 
 void radio_init()
 
 {
-    char channel_id[5];
+     char channel_id[5];
     sprintf(channel_id, "%d%d%d%d", pio_input_get(RADIO_CH0_PIO), pio_input_get(RADIO_CH1_PIO), pio_input_get(RADIO_CH2_PIO), pio_input_get(RADIO_CH3_PIO));
-    int channel = (int)strtol(channel_id, NULL, 2);
-    if (channel == 0)
-    {
-        channel = 1;
+     int channel = (int)strtol(channel_id, NULL, 2);
+     if (channel == 0)
+     {
+         channel = 1;
     }
 
     spi_cfg_t spi_cfg =
         {
-            .channel = channel,
+            .channel = 0,
             .clock_speed_kHz = 1000,
             .cs = RADIO_CS_PIO,
             .mode = SPI_MODE_0,
@@ -61,12 +61,12 @@ void radio_init()
     }
 }
 
-bool recieve_radio_data(void)
+/*bool recieve_radio_data(void)
 {
     char buffer[2];
     uint8_t bytes_read = nrf24_read(nrf_handle, buffer, 2);
     return bytes_read == 0 ? false : true;
-}
+}*/
 
 void radio_send_data(radio_payload_t *payload)
 {

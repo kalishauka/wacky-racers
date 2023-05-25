@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include "math.h"
 
-// #define BUZZER_PIO PA2_PIO
+#define BUZZER_PIO PA2_PIO
 #define TUNE_BPM 100
 #define DF1 "G/A/GF#E/"
 #define BUZZER_SOUND "B5F5/ F5E5D5C5E4E4C4"

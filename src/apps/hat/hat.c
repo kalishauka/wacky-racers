@@ -5,8 +5,8 @@
 #include "radio_module.h"
 #include "ledtape_utils.h"
 #include "ledbuffer.h"
-#include "battery_level.h"
-#include "buzzer_driver.h"
+// #include "battery_level.h"
+// #include "buzzer_driver.h"
 #include "usb_serial.h"
 #include "delay.h"
 #include "pio.h"
@@ -16,9 +16,6 @@ int main(void)
     usb_serial_stdio_init();
     radio_init();
 
-    adc_t adc;
-    adc = battery_init(adc);
-    buzzer_init();
     pacer_init(1000);
 
     radio_payload_t motor_data;
@@ -53,23 +50,26 @@ int main(void)
     {
         count++;
 
-        delay_ms(1);
-        bool battery_good = check_battery_level(&adc);
-
         // buzzer_update();
 
         set_pattern_simple(leds_seq);
 
-        if (count % 15 == 0)
-        {
+        char buffer[33];
 
-            bump = recieve_radio_data();
+        uint8_t bytes_read;
+        bytes_read = nrf24_read(nrf_handle, buffer, 32);
+        if (bytes_read != 0)
+        {
+            buffer[bytes_read] = 0;
+            printf("%s\n", buffer);
         }
 
-        if (bump)
-        {
-            // play song
-        }
+        delay_ms(10);
+
+        // if (bump)
+        // {
+        //     // play songB
+        // }
 
         ticks++;
         if (ticks < PACER_RATE / ACCEL_POLL_RATE)
@@ -83,7 +83,7 @@ int main(void)
             motor_data.right_motor = right_value;
             motor_data.reversing = reversing;
 
-            printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
+            // printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
 
             radio_send_data(&motor_data);
         }
