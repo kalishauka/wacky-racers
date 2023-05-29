@@ -11,12 +11,21 @@
 #include "delay.h"
 #include "pio.h"
 
+#define PACER_RATE 1000
+#define RADIO_TRANSMIT_RATE 10
+#define RADIO_RECIEVE_RATE 100
+#define BUZZER_UPDATE_RATE 1000
+#define LED_TAPE_UPDATE_RATE 25
+#define ACCEL_UPDATE_RATE 1000
+#define should_run(task_rate, counter) ((counter) % (PACER_RATE / (task_rate)) == 0)
+
 int main(void)
 {
+    uint16_t loop_count = 0;
     usb_serial_stdio_init();
     radio_init();
-
     pacer_init(1000);
+    // buzzer_init();
 
     radio_payload_t motor_data;
 
@@ -48,44 +57,54 @@ int main(void)
 
     while (1)
     {
-        count++;
+        loop_count = (loop_count % PACER_RATE) + 1;
 
-        // buzzer_update();
+        pacer_wait();
 
-        set_pattern_simple(leds_seq);
-
-        char buffer[33];
-
-        uint8_t bytes_read;
-        bytes_read = nrf24_read(nrf_handle, buffer, 32);
-        if (bytes_read != 0)
+        if (should_run(LED_TAPE_UPDATE_RATE, loop_count))
         {
-            buffer[bytes_read] = 0;
-            printf("%s\n", buffer);
+            set_pattern_simple(leds_seq);
         }
-
-        delay_ms(10);
-
-        // if (bump)
-        // {
-        //     // play songB
-        // }
-
-        ticks++;
-        if (ticks < PACER_RATE / ACCEL_POLL_RATE)
-            continue;
-        ticks = 0;
-
-        if (get_PWM(&left_value, &right_value, &reversing, adxl345))
+        if (should_run(100, loop_count))
         {
-            // motor_data.left_motor, motor_data.right_motor, motor_data.reversing
-            motor_data.left_motor = left_value;
-            motor_data.right_motor = right_value;
-            motor_data.reversing = reversing;
+            if (get_PWM(&left_value, &right_value, &reversing, adxl345))
+            {
+                motor_data.left_motor = left_value;
+                motor_data.right_motor = right_value;
+                motor_data.reversing = reversing;
 
-            // printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
+                printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
 
-            radio_send_data(&motor_data);
+                radio_send_data(&motor_data);
+            }
         }
     }
 }
+
+// if (should_run(RADIO_RECIEVE_RATE, loop_count))
+//{
+//     bool bumper_hit = receive_radio_data();
+//     printf("%d", bumper_hit);
+// }
+
+// if (should_run(BUZZER_UPDATE_RATE, loop_count))
+//{
+//     buzzer_beep();
+// }
+
+// ticks++;
+// if (ticks < PACER_RATE / ACCEL_POLL_RATE)
+//     continue;
+// ticks = 0;
+
+// if (get_PWM(&left_value, &right_value, &reversing, adxl345))
+// {
+//     // motor_data.left_motor, motor_data.right_motor, motor_data.reversing
+//     motor_data.left_motor = left_value;
+//     motor_data.right_motor = right_value;
+//     motor_data.reversing = reversing;
+
+//     // printf("Left Motor: %.2f || Right Motor: %.2f|| Reversing : %d struct\n", motor_data.left_motor, motor_data.right_motor, motor_data.reversing);
+
+//     radio_send_data(&motor_data);
+// }

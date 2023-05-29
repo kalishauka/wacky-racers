@@ -26,6 +26,6 @@ void radio_init(void);
 
 void radio_send_data(radio_payload_t *payload);
 
-bool recieve_radio_data(void);
+bool receive_radio_data(void);
 
 #endif // RADIO_MODULE_H

@@ -23,7 +23,11 @@
         "mmelody.h": "c",
         "piezo_beep.h": "c",
         "ledtape.h": "c",
-        "panic.h": "c"
+        "panic.h": "c",
+        "delay.h": "c",
+        "stdio.h": "c",
+        "piezo.h": "c",
+        "config.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "editor.formatOnSave": true,

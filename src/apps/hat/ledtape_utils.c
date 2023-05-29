@@ -55,8 +55,6 @@ void set_pattern(int *count, ledbuffer_t *leds, bool *blue)
 void set_pattern_simple(uint8_t *leds_seq)
 {
 
-    pacer_wait();
-
     for (int i = 0; i < NUM_LEDS; i++)
     {
         // Set full green  GRB order

@@ -3,6 +3,8 @@
    Date:   24 Feb 2018
 */
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "nrf24.h"
 #include "pio.h"
 #include "pacer.h"
@@ -12,17 +14,15 @@
 #include "adxl345_PWM.h"
 #include "radio_module.h"
 
-
-
-void radio_init()
+void radio_init(void)
 
 {
-     char channel_id[5];
+    char channel_id[5];
     sprintf(channel_id, "%d%d%d%d", pio_input_get(RADIO_CH0_PIO), pio_input_get(RADIO_CH1_PIO), pio_input_get(RADIO_CH2_PIO), pio_input_get(RADIO_CH3_PIO));
-     int channel = (int)strtol(channel_id, NULL, 2);
-     if (channel == 0)
-     {
-         channel = 1;
+    int channel = (int)strtol(channel_id, NULL, 2);
+    if (channel == 0)
+    {
+        channel = 1;
     }
 
     spi_cfg_t spi_cfg =
@@ -35,7 +35,7 @@ void radio_init()
             .bits = 8};
     nrf24_cfg_t nrf24_cfg =
         {
-            .channel = 14,
+            .channel = channel,
             .address = RADIO_ADDRESS,
             .payload_size = RADIO_PAYLOAD_SIZE,
             .ce_pio = RADIO_CE_PIO,
@@ -61,25 +61,21 @@ void radio_init()
     }
 }
 
-/*bool recieve_radio_data(void)
+bool receive_radio_data(void)
 {
-    char buffer[2];
-    uint8_t bytes_read = nrf24_read(nrf_handle, buffer, 2);
-    return bytes_read == 0 ? false : true;
-}*/
+    bool bumped = false;
+
+    uint8_t bytes_read;
+    bytes_read = nrf24_read(nrf_handle, &bumped, 1);
+    printf("%d", bytes_read);
+
+    return bumped;
+}
 
 void radio_send_data(radio_payload_t *payload)
 {
-
     char buffer[RADIO_PAYLOAD_SIZE + 1];
 
-    pacer_wait();
-    // pio_output_toggle(LED_STATUS_PIO);
-
-    // print struct to buffer
-
-    // snprintf(buffer, sizeof(buffer), "%.2f", left_value);
-    //"%.2f %.2f %d", left_value, right_value, reversing
     uint8_t status = nrf24_write(nrf_handle, payload, sizeof(radio_payload_t));
     if (!nrf24_write(nrf_handle, payload, sizeof(radio_payload_t)))
 

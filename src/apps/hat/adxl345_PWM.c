@@ -13,6 +13,7 @@
 #include "adxl345.h"
 #include "panic.h"
 #include <math.h>
+#include "adxl345_PWM.h"
 
 /*
  * NOTE: you must define ADXL345_ADDRESS in target.h for this to compile.
@@ -67,14 +68,15 @@ void find_motor_ratio(float x, float speed_constant, float *left_motor, float *r
 {
     *left_motor = 1.0;
     *right_motor = 1.0;
+    int sensitivity = 4;
 
     if (x > 0)
     {
-        *right_motor = 1.0 - x;
+        *right_motor = 1.0 - pow(x, sensitivity);
     }
     else
     {
-        *left_motor = 1.0 + x;
+        *left_motor = 1.0 - pow(x, sensitivity);
     }
 }
 
@@ -84,10 +86,27 @@ void find_motor_PWM(float speed_constant, float left_motor, float right_motor, f
     *left_value = speed_constant * left_motor;
 }
 
+int clamp(int value, int min, int max)
+{
+    if (value > max)
+    {
+        return max;
+    }
+    else if (value < min)
+    {
+        return min;
+    }
+    else
+    {
+        return value;
+    }
+}
+
 bool get_PWM(float *left_value, float *right_value, bool *reversing, adxl345_t *adxl345)
 {
 
     bool res;
+
     int count = 0;
 
     float default_speed = 0.7;
@@ -98,10 +117,10 @@ bool get_PWM(float *left_value, float *right_value, bool *reversing, adxl345_t *
     float PWM_value;
     float left_motor, right_motor;
 
-    /* Wait until next clock tick.  */
-    pacer_wait();
-
-    pio_output_toggle(LED_STATUS_PIO);
+    int x_max = 255;
+    int x_min = -255;
+    int y_max = 180;
+    int y_min = -180;
 
     /* Read in the accelerometer data.  */
     if (!adxl345_is_ready(adxl345))
@@ -116,27 +135,12 @@ bool get_PWM(float *left_value, float *right_value, bool *reversing, adxl345_t *
         if (adxl345_accel_read(adxl345, accel))
         {
 
-            if (accel[0] > 160)
-            {
-                accel[0] = 160;
-            }
-            else if (accel[0] < -160)
-            {
-                accel[0] = -160;
-            }
-
-            if (accel[1] > 160)
-            {
-                accel[1] = 160;
-            }
-            else if (accel[1] < -160)
-            {
-                accel[1] = -160;
-            }
+            accel[0] = clamp(accel[0], x_min, x_max);
+            accel[1] = clamp(accel[1], y_min, y_max);
 
             /* Standardize accelerometer values for easy transformation into PWM*/
-            x = map(accel[0], -160, 160, -1, 1);
-            y = map(accel[1], -160, 160, 0, 1);
+            x = map(accel[0], x_min, x_max, -1, 1);
+            y = map(accel[1], y_min, y_max, 0, 1);
 
             /* Find speed constant from y value of accelerometer*/
             speed_constant = find_speed_constant(y, default_speed, default_reverse_speed, reversing);
@@ -147,15 +151,10 @@ bool get_PWM(float *left_value, float *right_value, bool *reversing, adxl345_t *
             /* Find PWM values for each motor*/
             find_motor_PWM(speed_constant, left_motor, right_motor, left_value, right_value);
 
-            /* print PWM values to serial monitor*/
-            // printf("Left Motor: %f || Right Motor: %f || Reversing : %d\n", PWM_left_motor, PWM_right_motor, reversing);
-
             res = 1;
         }
         else
         {
-            printf(" %d \n", 3);
-
             res = 0;
         }
     }
